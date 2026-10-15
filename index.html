@@ -202,11 +202,11 @@ a.btn{text-decoration:none;display:inline-block}
         <p class="tip in">The file goes to your <b>Downloads</b> folder. It's named <b id="fnShow">Shield-Guard-review.html</b>. Your browser may show it at the top or bottom of the window.</p>
         <p><b>2.</b> Send that file to Jason (<span class="addr">Jason.Ackerman@kmbs.konicaminolta.us</span>):</p>
         <ul class="howto">
-          <li><b>By email:</b> click <b>Start the email</b> below. A new email opens, addressed to Jason. Click <b>Attach File</b> (the paper clip), choose <b>Browse This PC</b>, open <b>Downloads</b>, pick your review file, then click <b>Send</b>.</li>
+          <li><b>By email:</b> click <b>Open a new Outlook email</b> below. Outlook opens in a new tab with an email already addressed to Jason. Click <b>Attach</b> (the paper clip), choose <b>Browse this computer</b>, open <b>Downloads</b>, pick your review file, then click <b>Send</b>.</li>
           <li><b>By Teams:</b> open a chat with Jason Ackerman, click the paper clip (or the <b>+</b>), choose <b>Upload from my computer</b>, open <b>Downloads</b>, pick your review file, then send.</li>
         </ul>
-        <div class="actions"><a class="btn ghost" id="mailBtn" href="#">Start the email</a></div>
-        <p class="tip in">If "Start the email" doesn't open anything, start a new email to Jason yourself and attach the file the same way.</p>
+        <div class="actions"><a class="btn ghost" id="mailBtn" href="https://outlook.office.com/mail/deeplink/compose" target="_blank" rel="noopener">Open a new Outlook email</a><button class="btn ghost" type="button" id="copyAddr">Copy Jason's email address</button><span id="addrMsg" class="hint" role="status"></span></div>
+        <p class="tip in">Prefer your usual email program? Start a new email, click <b>Copy Jason's email address</b>, paste it into the "To" line, and attach the file the same way.</p>
         <details><summary>Or copy your comments as text (no screenshots)</summary>
           <textarea id="sendText" readonly rows="8" aria-label="Your comments as text"></textarea>
           <div class="actions"><button class="btn ghost" type="button" id="copyBtn">Copy text</button><span id="copyMsg" class="hint"></span></div>
@@ -318,8 +318,13 @@ a.btn{text-decoration:none;display:inline-block}
   };
   $("sendBtn").onclick=function(){
     $("sendText").value=asText();$("copyMsg").textContent="";$("fnShow").textContent=fileName();$("sendbox").hidden=false;
-    $("mailBtn").href="mailto:"+TO+"?subject="+encodeURIComponent("Shield Guard video review: "+(myName||"comments"))+"&body="+encodeURIComponent("Hi Jason,\n\nMy review of the Shield Guard video is attached ("+fileName()+").\n\n"+myName);
+    $("mailBtn").href="https://outlook.office.com/mail/deeplink/compose?to="+encodeURIComponent(TO)+"&subject="+encodeURIComponent("Shield Guard video review: "+(myName||"comments"))+"&body="+encodeURIComponent("Hi Jason,\n\nMy review of the Shield Guard video is attached ("+fileName()+").\n\n"+myName);
     $("sendbox").scrollIntoView({block:"nearest"});
+  };
+  $("copyAddr").onclick=function(){
+    var done=function(){$("addrMsg").textContent="Copied. Paste it into the To line."};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(TO).then(done,function(){$("addrMsg").textContent=TO})}
+    else{$("addrMsg").textContent=TO}
   };
   $("copyBtn").onclick=function(){
     var txt=$("sendText").value;
