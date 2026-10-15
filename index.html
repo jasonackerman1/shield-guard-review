@@ -96,6 +96,23 @@ details.chapters summary{padding:12px 14px;font-weight:600;cursor:pointer}
 .sendbox details[open] summary{margin-bottom:8px}
 .sendbox textarea{width:100%;font-family:var(--mono);font-size:13px}
 a.btn{text-decoration:none;display:inline-block}
+.hdr-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+@media (max-width:640px){.hdr-r{align-items:flex-start}}
+.guide{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.guide-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.guide h2{margin:0;font-size:22px}
+.guide .x{background:none;border:0;color:var(--accent);font-weight:600;padding:0;font-size:15px}
+.steps{margin:0;padding-left:28px;display:flex;flex-direction:column;gap:8px;font-size:17px;max-width:900px}
+.steps li::marker{font-weight:700;color:var(--accent)}
+.reassure{margin:0;padding:12px 14px;background:var(--ok-soft);font-size:16px;max-width:900px}
+.faq summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:16px}
+.faq dl{margin:10px 0 0;display:grid;gap:4px;max-width:900px}
+.faq dt{font-weight:700;margin-top:8px}
+.faq dd{margin:0;color:var(--ink)}
+.tcx{font-family:var(--mono);background:var(--accent);color:var(--accent-ink);padding:0 6px}
+.tip{margin:0;padding:0 14px 12px;color:var(--muted);font-size:14px}
+.tip.in{padding:0}
+.howto{margin:0;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:6px}
 .modal{position:fixed;inset:0;background:rgba(10,14,20,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
 .modal form{background:var(--surface);border:1px solid var(--line);padding:22px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:12px}
 .modal h2{margin:0;font-size:20px}
@@ -108,10 +125,35 @@ a.btn{text-decoration:none;display:inline-block}
     <div>
       <div class="eyebrow">Video review</div>
       <h1>Shield Guard Sales Training</h1>
-      <p class="sub">Pause anywhere and add a comment. When you're done, click <b>Send my comments</b> and paste them into an email or Teams message to Jason Ackerman.</p>
+      <p class="sub">Watch the video and leave notes on anything that should change. Your notes go to Jason Ackerman.</p>
     </div>
-    <div class="me" id="meBox" hidden>Commenting as <b id="meName"></b> <button type="button" id="meChange">Change</button></div>
+    <div class="hdr-r"><button class="btn ghost" type="button" id="helpBtn">How to use this page</button><div class="me" id="meBox" hidden>Commenting as <b id="meName"></b> <button type="button" id="meChange">Change</button></div></div>
   </header>
+
+
+  <section class="guide" id="guide" aria-labelledby="guideH">
+    <div class="guide-h"><h2 id="guideH">How to review this video</h2><button type="button" class="x" id="guideClose">Hide these steps</button></div>
+    <ol class="steps">
+      <li><b>Press play.</b> Click the play button on the video. Use the speaker button on the video to turn the sound up or down.</li>
+      <li><b>See something to change? Click the blue "Add comment" button</b> under the video. The video stops on that spot for you. The first time, it asks for your name.</li>
+      <li><b>Type your note</b> in the box, for example "This slide moves too fast." Then click <b>Save comment</b>. A small picture of that moment is saved with your note.</li>
+      <li><b>Press play again</b> and keep watching. Add as many comments as you like. They appear in the "Your comments" list.</li>
+      <li><b>When you're finished, click "Send my comments"</b> and follow the two steps it shows: download your review file, then email it to Jason.</li>
+    </ol>
+    <p class="reassure"><b>Need a break?</b> You can close this page any time. Your comments are kept on this computer. Come back to this same link on the same computer, using the same web browser (for example Chrome or Edge), and everything will still be here. The video starts where you stopped.</p>
+    <details class="faq">
+      <summary>Questions and problems</summary>
+      <dl>
+        <dt>The video won't play.</dt><dd>Wait a few seconds, then click play again. If it still won't start, refresh the page: press <b>F5</b> on Windows, or <b>Cmd + R</b> on a Mac. Your comments won't be lost.</dd>
+        <dt>Where did my comments go?</dt><dd>They're saved only on the computer and web browser you used. A different computer, a different browser, or a private/incognito window won't show them. Go back to the one you used before.</dd>
+        <dt>I made a mistake in a comment.</dt><dd>Click <b>Delete</b> under that comment, then add a new one.</dd>
+        <dt>How do I jump back to a comment?</dt><dd>Click the blue time (like <span class="tcx">4:22</span>) or the small picture on any comment. The video jumps to that moment. The orange dots under the video show where your comments are; you can click those too.</dd>
+        <dt>How do I find a certain slide?</dt><dd>Click <b>Slides (22)</b> under the video to see the list, then click a slide to jump to it.</dd>
+        <dt>Can I use my phone?</dt><dd>Yes, but a computer is easier. Your comments stay on the device you used.</dd>
+        <dt>Who sees my comments?</dt><dd>Only Jason, once you send them. Nobody else can see them on this page.</dd>
+      </dl>
+    </details>
+  </section>
 
   <div class="grid">
     <section class="panel" aria-label="Video">
@@ -126,6 +168,7 @@ a.btn{text-decoration:none;display:inline-block}
         <span class="chname" id="chname">Slide 1 · Opening</span>
         <button class="btn" id="addBtn" type="button">Add comment</button>
       </div>
+      <p class="tip" id="addTip">Tip: click <b>Add comment</b> at the moment you want to talk about. The video stops there for you.</p>
       <form class="composer" id="composer" hidden>
         <div class="row">
           <img id="cThumb" alt="Frame at the comment time">
@@ -137,6 +180,7 @@ a.btn{text-decoration:none;display:inline-block}
           <button class="btn ghost" id="cancelBtn" type="button">Cancel</button>
           <span class="err" id="cErr" role="alert"></span>
         </div>
+        <p class="tip in">Type what should change, then click <b>Save comment</b>. Changed your mind? Click <b>Cancel</b>. When you're done, press play on the video to keep watching.</p>
       </form>
       <details class="chapters">
         <summary>Slides (22)</summary>
@@ -150,13 +194,19 @@ a.btn{text-decoration:none;display:inline-block}
         <div class="actions"><button class="btn" type="button" id="sendBtn" disabled>Send my comments</button></div>
       </div>
       <div class="list" id="list">
-        <div class="empty" id="empty"><b>No comments yet.</b><br>Play the video, pause where something needs to change, and click <b>Add comment</b>. Your comments show up here in time order. They stay saved on this computer, so you can stop and come back later in the same browser.</div>
+        <div class="empty" id="empty"><b>No comments yet.</b><br>When you add a comment, it shows up here. Your comments are saved on this computer, so you can stop and come back later.</div>
       </div>
       <div class="sendbox" id="sendbox" hidden>
         <p><b>1.</b> Download your review. It's one file with every comment, its time and its screenshot.</p>
         <div class="actions"><button class="btn" type="button" id="dlBtn">Download my review</button></div>
-        <p><b>2.</b> Email the file to <span class="addr">Jason.Ackerman@kmbs.konicaminolta.us</span>, or attach it in Teams.</p>
+        <p class="tip in">The file goes to your <b>Downloads</b> folder. It's named <b id="fnShow">Shield-Guard-review.html</b>. Your browser may show it at the top or bottom of the window.</p>
+        <p><b>2.</b> Send that file to Jason (<span class="addr">Jason.Ackerman@kmbs.konicaminolta.us</span>):</p>
+        <ul class="howto">
+          <li><b>By email:</b> click <b>Start the email</b> below. A new email opens, addressed to Jason. Click <b>Attach File</b> (the paper clip), choose <b>Browse This PC</b>, open <b>Downloads</b>, pick your review file, then click <b>Send</b>.</li>
+          <li><b>By Teams:</b> open a chat with Jason Ackerman, click the paper clip (or the <b>+</b>), choose <b>Upload from my computer</b>, open <b>Downloads</b>, pick your review file, then send.</li>
+        </ul>
         <div class="actions"><a class="btn ghost" id="mailBtn" href="#">Start the email</a></div>
+        <p class="tip in">If "Start the email" doesn't open anything, start a new email to Jason yourself and attach the file the same way.</p>
         <details><summary>Or copy your comments as text (no screenshots)</summary>
           <textarea id="sendText" readonly rows="8" aria-label="Your comments as text"></textarea>
           <div class="actions"><button class="btn ghost" type="button" id="copyBtn">Copy text</button><span id="copyMsg" class="hint"></span></div>
@@ -170,7 +220,7 @@ a.btn{text-decoration:none;display:inline-block}
 <div class="modal" id="nameModal" hidden>
   <form id="nameForm">
     <h2>What's your name?</h2>
-    <p>It goes at the top of your comments so Jason knows who sent them.</p>
+    <p>Type your first and last name, then click Continue. It goes on your comments so Jason knows who sent them. You only do this once.</p>
     <input type="text" id="nameInput" maxlength="80" autocomplete="name" aria-label="Your name" required>
     <div class="actions"><button class="btn" type="submit">Continue</button></div>
   </form>
@@ -198,6 +248,9 @@ a.btn{text-decoration:none;display:inline-block}
   var wantComposer=false;
   $("nameForm").addEventListener("submit",function(e){e.preventDefault();var n=$("nameInput").value.trim();if(!n)return;myName=n;store("sgr-name",n);$("nameModal").hidden=true;showName();if(wantComposer){wantComposer=false;openComposer()}});
   $("meChange").onclick=askName;showName();
+  if(store("sgr-guide")==="hidden")$("guide").hidden=true;
+  $("guideClose").onclick=function(){$("guide").hidden=true;store("sgr-guide","hidden")};
+  $("helpBtn").onclick=function(){$("guide").hidden=false;store("sgr-guide","shown");$("guide").scrollIntoView({block:"start"})};
 
   v.addEventListener("error",function(){var m=$("vmsg");m.textContent="The video couldn't load. Refresh the page to try again.";m.hidden=false});
   CH.forEach(function(c,i){
@@ -264,7 +317,7 @@ a.btn{text-decoration:none;display:inline-block}
     a.href=u;a.download=fileName();document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);
   };
   $("sendBtn").onclick=function(){
-    $("sendText").value=asText();$("copyMsg").textContent="";$("sendbox").hidden=false;
+    $("sendText").value=asText();$("copyMsg").textContent="";$("fnShow").textContent=fileName();$("sendbox").hidden=false;
     $("mailBtn").href="mailto:"+TO+"?subject="+encodeURIComponent("Shield Guard video review: "+(myName||"comments"))+"&body="+encodeURIComponent("Hi Jason,\n\nMy review of the Shield Guard video is attached ("+fileName()+").\n\n"+myName);
     $("sendbox").scrollIntoView({block:"nearest"});
   };
@@ -276,7 +329,7 @@ a.btn{text-decoration:none;display:inline-block}
   $("closeSend").onclick=function(){$("sendbox").hidden=true};
 
   function render(){
-    $("counts").textContent=comments.length?(comments.length+(comments.length===1?" comment":" comments")+" saved in this browser"):"None yet";
+    $("counts").textContent=comments.length?(comments.length+(comments.length===1?" comment":" comments")+" saved on this computer"):"None yet. The Send button turns on after your first comment.";
     $("sendBtn").disabled=!comments.length;
     track.querySelectorAll(".dot").forEach(function(d){d.remove()});
     comments.forEach(function(c){
