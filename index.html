@@ -138,7 +138,7 @@ a.btn{text-decoration:none;display:inline-block}
       <li><b>See something to change? Click the blue "Add comment" button</b> under the video. The video stops on that spot for you. The first time, it asks for your name.</li>
       <li><b>Type your note</b> in the box, for example "This slide moves too fast." Then click <b>Save comment</b>. A small picture of that moment is saved with your note.</li>
       <li><b>Press play again</b> and keep watching. Add as many comments as you like. They appear in the "Your comments" list.</li>
-      <li><b>When you're finished, click "Send my comments"</b> and follow the two steps it shows: download your review file, then email it to Jason.</li>
+      <li><b>When you're finished, click "Send my comments"</b> and follow the two steps it shows: download your review (a PDF), then email it to Jason.</li>
     </ol>
     <p class="reassure"><b>Need a break?</b> You can close this page any time. Your comments are kept on this computer. Come back to this same link on the same computer, using the same web browser (for example Chrome or Edge), and everything will still be here. The video starts where you stopped.</p>
     <details class="faq">
@@ -197,9 +197,9 @@ a.btn{text-decoration:none;display:inline-block}
         <div class="empty" id="empty"><b>No comments yet.</b><br>When you add a comment, it shows up here. Your comments are saved on this computer, so you can stop and come back later.</div>
       </div>
       <div class="sendbox" id="sendbox" hidden>
-        <p><b>1.</b> Download your review. It's one file with every comment, its time and its screenshot.</p>
-        <div class="actions"><button class="btn" type="button" id="dlBtn">Download my review</button></div>
-        <p class="tip in">The file goes to your <b>Downloads</b> folder. It's named <b id="fnShow">Shield-Guard-review.html</b>. Your browser may show it at the top or bottom of the window.</p>
+        <p><b>1.</b> Download your review. It's a PDF with a large picture of each moment you commented on, and your comment under it.</p>
+        <div class="actions"><button class="btn" type="button" id="dlBtn">Download my review (PDF)</button><span id="dlMsg" class="hint" role="status"></span></div>
+        <p class="tip in">The file goes to your <b>Downloads</b> folder. It's named <b id="fnShow">Shield-Guard-review.pdf</b>. Your browser may show it at the top or bottom of the window.</p>
         <p><b>2.</b> Send that file to Jason (<span class="addr">Jason.Ackerman@kmbs.konicaminolta.us</span>):</p>
         <ul class="howto">
           <li><b>By email:</b> click <b>Open a new Outlook email</b> below. Outlook opens in a new tab with an email already addressed to Jason. Click <b>Attach</b> (the paper clip), choose <b>Browse this computer</b>, open <b>Downloads</b>, pick your review file, then click <b>Send</b>.</li>
@@ -226,6 +226,7 @@ a.btn{text-decoration:none;display:inline-block}
   </form>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
   var DUR = 919.53;
@@ -299,22 +300,53 @@ a.btn{text-decoration:none;display:inline-block}
     comments.forEach(function(c){lines.push("["+fmt(c.t)+"] Slide "+c.slide+": "+c.body.replace(/\s*\n\s*/g," / "))});
     return lines.join("\n");
   }
-  function esc(x){return String(x).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]})}
-  function report(){
-    var rows=comments.map(function(c){
-      return '<div class="r">'+(c.thumb?'<img src="'+c.thumb+'" alt="">':'<div class="noimg">No snapshot</div>')+
-        '<div><div class="m"><span class="tc">'+fmt(c.t)+'</span> Slide '+c.slide+' · '+esc(CH[c.slide-1]?CH[c.slide-1][1]:"")+'</div><p>'+esc(c.body).replace(/\n/g,"<br>")+'</p></div></div>';
-    }).join("");
-    var d=new Date().toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});
-    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shield Guard review: '+esc(myName)+'</title>'+
-      '<style>body{font-family:"Segoe UI",Arial,sans-serif;margin:0;padding:24px 16px;color:#1B1F27;background:#F4F6F9}main{max-width:900px;margin:0 auto}h1{margin:0;font-size:26px}.s{color:#5D6675;margin:4px 0 20px}.r{display:grid;grid-template-columns:320px 1fr;gap:16px;background:#fff;border:1px solid #DCE1E8;padding:14px;margin-bottom:10px}.r img,.noimg{width:320px;max-width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;display:block}.noimg{color:#fff;display:flex;align-items:center;justify-content:center}.m{color:#5D6675;font-size:14px}.tc{font-family:Menlo,monospace;background:#0062C2;color:#fff;padding:2px 8px;margin-right:6px}p{margin:8px 0 0;white-space:normal}@media(max-width:640px){.r{grid-template-columns:1fr}}</style></head><body><main>'+
-      '<h1>Shield Guard Sales Training: review</h1><p class="s">'+esc(myName||"Reviewer")+' · '+comments.length+(comments.length===1?" comment":" comments")+' · '+d+'</p>'+rows+
-      '<script type="application/json" id="review-data">'+JSON.stringify({video:"shield-guard-sales-training",reviewer:myName,comments:comments.map(function(c){return {t:c.t,slide:c.slide,body:c.body}})}).replace(/</g,"\\u003c")+'<\/script></main></body></html>';
+  // Full-size frames for the PDF come from a hidden copy of the video, so the main player doesn't jump.
+  var hv=null;
+  function frameAt(t,fallback){
+    return new Promise(function(res){
+      var done=false,finish=function(x){if(!done){done=true;res(x)}};
+      setTimeout(function(){finish(fallback)},15000);
+      function shoot(){try{var c=document.createElement("canvas");c.width=1600;c.height=900;c.getContext("2d").drawImage(hv,0,0,1600,900);finish(c.toDataURL("image/jpeg",0.85))}catch(e){finish(fallback)}}
+      function go(){hv.addEventListener("seeked",function on(){hv.removeEventListener("seeked",on);setTimeout(shoot,120)});hv.currentTime=Math.max(0.05,t)}
+      if(!hv){hv=document.createElement("video");hv.crossOrigin="anonymous";hv.muted=true;hv.preload="auto";hv.playsInline=true;hv.src=v.currentSrc||v.src}
+      if(hv.readyState>=1)go();else hv.addEventListener("loadedmetadata",go,{once:true});
+    });
   }
-  function fileName(){return "Shield-Guard-review-"+(myName||"reviewer").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")+".html"}
+  function fileName(){return "Shield-Guard-review-"+(myName||"reviewer").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")+".pdf"}
+  function makePdf(){
+    var J=window.jspdf&&window.jspdf.jsPDF;if(!J)return Promise.reject(new Error("nolib"));
+    var doc=new J({unit:"pt",format:"letter",orientation:"landscape"}),W=792,H=612,M=36,IH=400,IW=IH*16/9;
+    var blue=[0,98,194],ink=[27,31,39],muted=[93,102,117];
+    var d=new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+    doc.setProperties({title:"Shield Guard video review: "+(myName||"Reviewer"),author:myName||"Reviewer",subject:"review-data:"+JSON.stringify(comments.map(function(c){return {t:c.t,slide:c.slide,body:c.body}}))});
+    doc.setFont("helvetica","bold");doc.setFontSize(20);doc.setTextColor(ink[0],ink[1],ink[2]);doc.text("Shield Guard Sales Training: video review",M,M+14);
+    doc.setFont("helvetica","normal");doc.setFontSize(11);doc.setTextColor(muted[0],muted[1],muted[2]);
+    doc.text((myName||"Reviewer")+"  -  "+comments.length+(comments.length===1?" comment":" comments")+"  -  "+d,M,M+34);
+    var y=M+56,i=0;
+    function next(){
+      if(i>=comments.length){return Promise.resolve(doc)}
+      var c=comments[i];$("dlMsg").textContent="Making your PDF… picture "+(i+1)+" of "+comments.length;
+      return frameAt(c.t,c.thumb).then(function(img){
+        doc.setFont("helvetica","normal");doc.setFontSize(12);
+        if(i>0){doc.addPage();y=M}
+        var lines=doc.splitTextToSize(c.body||"",W-2*M);
+        var ih=Math.max(200,Math.min(IH,H-M-y-28-lines.length*16-8)),iw=ih*16/9;
+        if(img){doc.addImage(img,"JPEG",M,y,iw,ih)}else{doc.setFillColor(20,20,20);doc.rect(M,y,iw,ih,"F")}
+        y+=ih+22;
+        var tc=fmt(c.t);doc.setFont("courier","bold");doc.setFontSize(12);var tw=doc.getTextWidth(tc)+12;
+        doc.setFillColor(blue[0],blue[1],blue[2]);doc.rect(M,y-12,tw,17,"F");doc.setTextColor(255,255,255);doc.text(tc,M+6,y);
+        doc.setFont("helvetica","bold");doc.setTextColor(ink[0],ink[1],ink[2]);doc.text("Slide "+c.slide+"  -  "+(CH[c.slide-1]?CH[c.slide-1][1]:""),M+tw+10,y);
+        y+=20;doc.setFont("helvetica","normal");doc.setFontSize(12);doc.setTextColor(ink[0],ink[1],ink[2]);lines.forEach(function(L){if(y>H-M){doc.addPage();y=M}doc.text(L,M,y);y+=16});y-=lines.length*16;
+        y+=24;i++;return next();
+      });
+    }
+    return next();
+  }
   $("dlBtn").onclick=function(){
-    var blob=new Blob([report()],{type:"text/html"}),u=URL.createObjectURL(blob),a=document.createElement("a");
-    a.href=u;a.download=fileName();document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);
+    var btn=$("dlBtn");btn.disabled=true;$("dlMsg").textContent="Making your PDF…";
+    makePdf().then(function(doc){doc.save(fileName());$("dlMsg").textContent="Done. Check your Downloads folder."})
+    .catch(function(){$("dlMsg").textContent="The PDF couldn't be made. Refresh the page and try again."})
+    .finally(function(){btn.disabled=false});
   };
   $("sendBtn").onclick=function(){
     $("sendText").value=asText();$("copyMsg").textContent="";$("fnShow").textContent=fileName();$("sendbox").hidden=false;
