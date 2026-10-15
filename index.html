@@ -91,6 +91,9 @@ details.chapters summary{padding:12px 14px;font-weight:600;cursor:pointer}
 .sendbox{border-top:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--accent-soft)}
 .sendbox p{margin:0;font-size:14px}
 .sendbox .addr{font-family:var(--mono);font-size:13px;user-select:all;overflow-wrap:anywhere}
+.hint{color:var(--muted);font-size:14px}
+.sendbox details summary{cursor:pointer;font-size:14px;color:var(--accent);font-weight:600}
+.sendbox details[open] summary{margin-bottom:8px}
 .sendbox textarea{width:100%;font-family:var(--mono);font-size:13px}
 a.btn{text-decoration:none;display:inline-block}
 .modal{position:fixed;inset:0;background:rgba(10,14,20,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
@@ -147,12 +150,18 @@ a.btn{text-decoration:none;display:inline-block}
         <div class="actions"><button class="btn" type="button" id="sendBtn" disabled>Send my comments</button></div>
       </div>
       <div class="list" id="list">
-        <div class="empty" id="empty"><b>No comments yet.</b><br>Play the video, pause where something needs to change, and click <b>Add comment</b>. Your comments show up here in time order and stay saved in this browser until you send them.</div>
+        <div class="empty" id="empty"><b>No comments yet.</b><br>Play the video, pause where something needs to change, and click <b>Add comment</b>. Your comments show up here in time order. They stay saved on this computer, so you can stop and come back later in the same browser.</div>
       </div>
       <div class="sendbox" id="sendbox" hidden>
-        <p><b>Copied.</b> Paste into an email or Teams message to <span class="addr">Jason.Ackerman@kmbs.konicaminolta.us</span>. If the copy didn't work, select the text below and copy it.</p>
-        <textarea id="sendText" readonly rows="8" aria-label="Your comments as text"></textarea>
-        <div class="actions"><a class="btn ghost" id="mailBtn" href="#">Open in email</a><button class="btn ghost" type="button" id="closeSend">Done</button></div>
+        <p><b>1.</b> Download your review. It's one file with every comment, its time and its screenshot.</p>
+        <div class="actions"><button class="btn" type="button" id="dlBtn">Download my review</button></div>
+        <p><b>2.</b> Email the file to <span class="addr">Jason.Ackerman@kmbs.konicaminolta.us</span>, or attach it in Teams.</p>
+        <div class="actions"><a class="btn ghost" id="mailBtn" href="#">Start the email</a></div>
+        <details><summary>Or copy your comments as text (no screenshots)</summary>
+          <textarea id="sendText" readonly rows="8" aria-label="Your comments as text"></textarea>
+          <div class="actions"><button class="btn ghost" type="button" id="copyBtn">Copy text</button><span id="copyMsg" class="hint"></span></div>
+        </details>
+        <div class="actions"><button class="btn ghost" type="button" id="closeSend">Done</button></div>
       </div>
     </aside>
   </div>
@@ -205,6 +214,9 @@ a.btn{text-decoration:none;display:inline-block}
     var i=chapterAt(v.currentTime);$("chname").textContent="Slide "+(i+1)+" · "+CH[i][1];
     fill.style.width=(v.currentTime/dur()*100)+"%";
   });
+  var resumeAt=parseFloat(store("sgr-pos")||"0"),lastSaved=0;
+  v.addEventListener("loadedmetadata",function(){if(resumeAt>5&&resumeAt<dur()-5){seek(resumeAt)}},{once:true});
+  v.addEventListener("timeupdate",function(){if(Math.abs(v.currentTime-lastSaved)>3){lastSaved=v.currentTime;store("sgr-pos",String(Math.floor(v.currentTime)))}});
   track.addEventListener("click",function(e){if(e.target.classList.contains("dot"))return;var r=track.getBoundingClientRect();seek((e.clientX-r.left)/r.width*dur())});
 
   function grab(){
@@ -234,12 +246,32 @@ a.btn{text-decoration:none;display:inline-block}
     comments.forEach(function(c){lines.push("["+fmt(c.t)+"] Slide "+c.slide+": "+c.body.replace(/\s*\n\s*/g," / "))});
     return lines.join("\n");
   }
+  function esc(x){return String(x).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]})}
+  function report(){
+    var rows=comments.map(function(c){
+      return '<div class="r">'+(c.thumb?'<img src="'+c.thumb+'" alt="">':'<div class="noimg">No snapshot</div>')+
+        '<div><div class="m"><span class="tc">'+fmt(c.t)+'</span> Slide '+c.slide+' · '+esc(CH[c.slide-1]?CH[c.slide-1][1]:"")+'</div><p>'+esc(c.body).replace(/\n/g,"<br>")+'</p></div></div>';
+    }).join("");
+    var d=new Date().toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shield Guard review: '+esc(myName)+'</title>'+
+      '<style>body{font-family:"Segoe UI",Arial,sans-serif;margin:0;padding:24px 16px;color:#1B1F27;background:#F4F6F9}main{max-width:900px;margin:0 auto}h1{margin:0;font-size:26px}.s{color:#5D6675;margin:4px 0 20px}.r{display:grid;grid-template-columns:320px 1fr;gap:16px;background:#fff;border:1px solid #DCE1E8;padding:14px;margin-bottom:10px}.r img,.noimg{width:320px;max-width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;display:block}.noimg{color:#fff;display:flex;align-items:center;justify-content:center}.m{color:#5D6675;font-size:14px}.tc{font-family:Menlo,monospace;background:#0062C2;color:#fff;padding:2px 8px;margin-right:6px}p{margin:8px 0 0;white-space:normal}@media(max-width:640px){.r{grid-template-columns:1fr}}</style></head><body><main>'+
+      '<h1>Shield Guard Sales Training: review</h1><p class="s">'+esc(myName||"Reviewer")+' · '+comments.length+(comments.length===1?" comment":" comments")+' · '+d+'</p>'+rows+
+      '<script type="application/json" id="review-data">'+JSON.stringify({video:"shield-guard-sales-training",reviewer:myName,comments:comments.map(function(c){return {t:c.t,slide:c.slide,body:c.body}})}).replace(/</g,"\\u003c")+'<\/script></main></body></html>';
+  }
+  function fileName(){return "Shield-Guard-review-"+(myName||"reviewer").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")+".html"}
+  $("dlBtn").onclick=function(){
+    var blob=new Blob([report()],{type:"text/html"}),u=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=u;a.download=fileName();document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);
+  };
   $("sendBtn").onclick=function(){
-    var txt=asText();$("sendText").value=txt;$("sendbox").hidden=false;
-    $("mailBtn").href="mailto:"+TO+"?subject="+encodeURIComponent("Shield Guard video review: "+(myName||"comments"))+"&body="+encodeURIComponent(txt.length>1800?txt.slice(0,1800)+"\n\n(Paste the rest from the review page.)":txt);
-    var p=$("sendbox").querySelector("p b");
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){p.textContent="Copied."},function(){p.textContent="Select and copy the text below.";$("sendText").select()})}
-    else{p.textContent="Select and copy the text below.";$("sendText").select()}
+    $("sendText").value=asText();$("copyMsg").textContent="";$("sendbox").hidden=false;
+    $("mailBtn").href="mailto:"+TO+"?subject="+encodeURIComponent("Shield Guard video review: "+(myName||"comments"))+"&body="+encodeURIComponent("Hi Jason,\n\nMy review of the Shield Guard video is attached ("+fileName()+").\n\n"+myName);
+    $("sendbox").scrollIntoView({block:"nearest"});
+  };
+  $("copyBtn").onclick=function(){
+    var txt=$("sendText").value;
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){$("copyMsg").textContent="Copied."},function(){$("sendText").select();$("copyMsg").textContent="Press Ctrl+C or Cmd+C to copy."})}
+    else{$("sendText").select();$("copyMsg").textContent="Press Ctrl+C or Cmd+C to copy."}
   };
   $("closeSend").onclick=function(){$("sendbox").hidden=true};
 
