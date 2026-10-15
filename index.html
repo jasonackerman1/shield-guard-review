@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Shield Guard Video Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: review desk. Player + comment timeline on the left, the comment log on the right; stacks on phones. */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --ink:#1B1F27; --muted:#5D6675; --line:#DCE1E8;
+  --accent:#0062C2; --accent-ink:#FFFFFF; --accent-soft:#E3EEF9; --ok:#1E7A4F; --ok-soft:#E2F2E9; --warn:#B4531B;
+  --body:"Source Sans 3","Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#12161D; --surface:#1B2029; --ink:#E7EAF0; --muted:#9AA3B2; --line:#2D3440;
+  --accent:#4A9BEA; --accent-ink:#0B1420; --accent-soft:#1D3047; --ok:#5CC28F; --ok-soft:#173326; --warn:#E59563; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:20px 40px}
+[hidden]{display:none!important}
+.wrap{max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.1;margin:2px 0 0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:15px}
+.me{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--muted)}
+.me b{color:var(--ink)}
+.me button{background:none;border:0;color:var(--accent);font-weight:600;padding:0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:20px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line)}
+.vbox{position:relative;background:#000;aspect-ratio:16/9;max-width:100%}
+video{width:100%;height:100%;display:block;background:#000}
+.vmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;text-align:center;padding:20px;background:rgba(0,0,0,.6)}
+.track{position:relative;height:30px;margin:0 14px;cursor:pointer}
+.track .rail{position:absolute;left:0;right:0;top:13px;height:4px;background:var(--line)}
+.track .fill{position:absolute;left:0;top:13px;height:4px;background:var(--accent);width:0}
+.track .ch{position:absolute;top:9px;width:1px;height:12px;background:var(--muted);opacity:.5}
+.track .dot{position:absolute;top:7px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--warn);border:2px solid var(--surface);padding:0;cursor:pointer}
+.track .dot.done{background:var(--ok)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 14px 14px;border-top:1px solid var(--line)}
+.now{font-family:var(--mono);font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chname{font-weight:600;min-width:0;flex:1 1 200px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;padding:10px 18px;font-weight:700;font-size:15px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.composer{display:flex;flex-direction:column;gap:10px;padding:14px;border-top:1px solid var(--line);background:var(--accent-soft)}
+.composer .row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.composer img{width:192px;max-width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;display:block}
+textarea,input[type=text]{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px}
+.composer textarea{flex:1 1 260px;min-width:0;min-height:96px;resize:vertical}
+.tc{font-family:var(--mono);font-weight:500;font-size:14px;font-variant-numeric:tabular-nums;background:var(--accent);color:var(--accent-ink);padding:2px 8px;border:0}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.err{color:var(--warn);font-size:14px}
+details.chapters{border-top:1px solid var(--line)}
+details.chapters summary{padding:12px 14px;font-weight:600;cursor:pointer}
+.chlist{list-style:none;margin:0;padding:0 14px 12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 16px}
+.chlist button{display:flex;gap:10px;width:100%;text-align:left;background:none;border:0;padding:5px 0;color:var(--ink)}
+.chlist .t{font-family:var(--mono);font-size:13px;color:var(--muted);min-width:44px;font-variant-numeric:tabular-nums}
+.side{display:flex;flex-direction:column;max-height:calc(100vh - 40px);position:sticky;top:12px}
+@media (max-width:1000px){.side{position:static;max-height:none}}
+.side-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.side-h h2{font-size:18px;margin:0}
+.counts{color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:4px}
+.tabs button{background:none;border:1px solid var(--line);color:var(--muted);padding:4px 10px;font-size:14px}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.list{overflow-y:auto;display:flex;flex-direction:column}
+.empty{padding:28px 18px;color:var(--muted);font-size:15px}
+.empty b{color:var(--ink)}
+.c{display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px;padding:14px;border-bottom:1px solid var(--line)}
+.c.active{background:var(--accent-soft)}
+.c .th{width:112px;aspect-ratio:16/9;object-fit:cover;background:#000;display:block;border:0;padding:0;cursor:pointer}
+.c .th.none{display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mono);font-size:13px}
+.c .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.c .who{color:var(--ink);font-weight:600}
+.c .txt{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.c .note{margin:8px 0 0;padding:8px 10px;background:var(--ok-soft);font-size:14px;overflow-wrap:anywhere}
+.c .note b{color:var(--ok)}
+.c .ops{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.c .ops button{background:none;border:0;padding:0;color:var(--accent);font-weight:600;font-size:14px}
+.pill{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;color:var(--surface)}
+.pill.open{background:var(--warn)}
+.pill.done{background:var(--ok)}
+.sendbox{border-top:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--accent-soft)}
+.sendbox p{margin:0;font-size:14px}
+.sendbox .addr{font-family:var(--mono);font-size:13px;user-select:all;overflow-wrap:anywhere}
+.sendbox textarea{width:100%;font-family:var(--mono);font-size:13px}
+a.btn{text-decoration:none;display:inline-block}
+.modal{position:fixed;inset:0;background:rgba(10,14,20,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal form{background:var(--surface);border:1px solid var(--line);padding:22px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:12px}
+.modal h2{margin:0;font-size:20px}
+.modal p{margin:0;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Video review</div>
+      <h1>Shield Guard Sales Training</h1>
+      <p class="sub">Pause anywhere and add a comment. When you're done, click <b>Send my comments</b> and paste them into an email or Teams message to Jason Ackerman.</p>
+    </div>
+    <div class="me" id="meBox" hidden>Commenting as <b id="meName"></b> <button type="button" id="meChange">Change</button></div>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-label="Video">
+      <div class="vbox">
+        <video id="v" controls playsinline preload="metadata" crossorigin="anonymous"
+          src="https://kmbs.canto.com/direct/video/6tpfg7dc4169jas0h8pd5m087m/BjEYZhJVE5Y0zrGnk2r02nfQmBw/original?content-type=video%2Fmp4&amp;name=SheildGuard+Sales+Traning.mp4"></video>
+        <div class="vmsg" id="vmsg" hidden></div>
+      </div>
+      <div class="track" id="track" aria-hidden="true"><div class="rail"></div><div class="fill" id="fill"></div></div>
+      <div class="bar">
+        <span class="now" id="now">0:00 / 15:19</span>
+        <span class="chname" id="chname">Slide 1 · Opening</span>
+        <button class="btn" id="addBtn" type="button">Add comment</button>
+      </div>
+      <form class="composer" id="composer" hidden>
+        <div class="row">
+          <img id="cThumb" alt="Frame at the comment time">
+          <textarea id="cText" placeholder="What should change here?" aria-label="Comment"></textarea>
+        </div>
+        <div class="actions">
+          <span>At <button type="button" class="tc" id="cTime">0:00</button></span>
+          <button class="btn" id="saveBtn" type="submit">Save comment</button>
+          <button class="btn ghost" id="cancelBtn" type="button">Cancel</button>
+          <span class="err" id="cErr" role="alert"></span>
+        </div>
+      </form>
+      <details class="chapters">
+        <summary>Slides (22)</summary>
+        <ul class="chlist" id="chlist"></ul>
+      </details>
+    </section>
+
+    <aside class="panel side" aria-label="Comments">
+      <div class="side-h">
+        <div><h2>Your comments</h2><div class="counts" id="counts">Loading…</div></div>
+        <div class="actions"><button class="btn" type="button" id="sendBtn" disabled>Send my comments</button></div>
+      </div>
+      <div class="list" id="list">
+        <div class="empty" id="empty"><b>No comments yet.</b><br>Play the video, pause where something needs to change, and click <b>Add comment</b>. Your comments show up here in time order and stay saved in this browser until you send them.</div>
+      </div>
+      <div class="sendbox" id="sendbox" hidden>
+        <p><b>Copied.</b> Paste into an email or Teams message to <span class="addr">Jason.Ackerman@kmbs.konicaminolta.us</span>. If the copy didn't work, select the text below and copy it.</p>
+        <textarea id="sendText" readonly rows="8" aria-label="Your comments as text"></textarea>
+        <div class="actions"><a class="btn ghost" id="mailBtn" href="#">Open in email</a><button class="btn ghost" type="button" id="closeSend">Done</button></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal" id="nameModal" hidden>
+  <form id="nameForm">
+    <h2>What's your name?</h2>
+    <p>It goes at the top of your comments so Jason knows who sent them.</p>
+    <input type="text" id="nameInput" maxlength="80" autocomplete="name" aria-label="Your name" required>
+    <div class="actions"><button class="btn" type="submit">Continue</button></div>
+  </form>
+</div>
+
+<script>
+(function(){
+  var DUR = 919.53;
+  var TO = "Jason.Ackerman@kmbs.konicaminolta.us";
+  var CH = [[0,"Opening"],[32.3,"Shield Guard | Konica Minolta"],[73.5,"Break the customer's 'we're fine' assumption"],[97.2,"Shield Guard: What Is It?"],[166.0,"Strengths That Sell Shield Guard"],[205.6,"Target Customers"],[252.0,"Product Overview"],[262.4,"Cloud-Based Monitoring & Automatic Remediation"],[314.2,"The Dashboard"],[378.6,"One-Stop Device Management"],[471.7,"Easy-to-Use Policy Management"],[545.1,"Policy Management and User Management"],[602.0,"Additional Features"],[652.3,"Three capabilities that cut security risk and admin workload"],[724.4,"Centralized Security Management"],[781.1,"Sales Toolkit"],[802.2,"Discovery Questions"],[829.7,"From Discovery to Validation"],[850.1,"Pitch & Talk Track"],[870.1,"Objection Handling"],[894.0,"Advance the Deal"],[910.5,"Close"]];
+  var $ = function(id){return document.getElementById(id)};
+  var v=$("v"), track=$("track"), fill=$("fill"), list=$("list"), empty=$("empty");
+  var draft=null, activeId=null, pendingDelete=null, canSnap=true;
+
+  function store(k,val){try{if(val===undefined)return localStorage.getItem(k);localStorage.setItem(k,val)}catch(e){return null}}
+  var myName=store("sgr-name")||"";
+  var comments=[];try{comments=JSON.parse(store("sgr-comments")||"[]")||[]}catch(e){comments=[]}
+  function save(){var ok=store("sgr-comments",JSON.stringify(comments));if(ok===null){try{localStorage.setItem("sgr-comments",JSON.stringify(comments.map(function(c){var o=Object.assign({},c);delete o.thumb;return o})))}catch(e){}}}
+
+  function fmt(s){s=Math.max(0,Math.floor(s));var m=Math.floor(s/60),x=s%60;return m+":"+(x<10?"0":"")+x}
+  function chapterAt(t){var i=0;for(var k=0;k<CH.length;k++){if(t>=CH[k][0])i=k}return i}
+
+  function showName(){$("meName").textContent=myName;$("meBox").hidden=!myName}
+  function askName(){$("nameInput").value=myName;$("nameModal").hidden=false;$("nameInput").focus()}
+  var wantComposer=false;
+  $("nameForm").addEventListener("submit",function(e){e.preventDefault();var n=$("nameInput").value.trim();if(!n)return;myName=n;store("sgr-name",n);$("nameModal").hidden=true;showName();if(wantComposer){wantComposer=false;openComposer()}});
+  $("meChange").onclick=askName;showName();
+
+  v.addEventListener("error",function(){var m=$("vmsg");m.textContent="The video couldn't load. Refresh the page to try again.";m.hidden=false});
+  CH.forEach(function(c,i){
+    var tick=document.createElement("div");tick.className="ch";tick.style.left=(c[0]/DUR*100)+"%";track.appendChild(tick);
+    var li=document.createElement("li"),b=document.createElement("button");b.type="button";
+    var t=document.createElement("span");t.className="t";t.textContent=fmt(c[0]);
+    var n=document.createElement("span");n.textContent=(i+1)+". "+c[1];
+    b.appendChild(t);b.appendChild(n);b.onclick=function(){seek(c[0]+0.05)};li.appendChild(b);$("chlist").appendChild(li);
+  });
+  function seek(t){try{v.currentTime=t}catch(e){}}
+  function dur(){return isFinite(v.duration)&&v.duration>0?v.duration:DUR}
+  v.addEventListener("timeupdate",function(){
+    $("now").textContent=fmt(v.currentTime)+" / "+fmt(dur());
+    var i=chapterAt(v.currentTime);$("chname").textContent="Slide "+(i+1)+" · "+CH[i][1];
+    fill.style.width=(v.currentTime/dur()*100)+"%";
+  });
+  track.addEventListener("click",function(e){if(e.target.classList.contains("dot"))return;var r=track.getBoundingClientRect();seek((e.clientX-r.left)/r.width*dur())});
+
+  function grab(){
+    if(!canSnap||v.readyState<2)return null;
+    try{var c=document.createElement("canvas");c.width=320;c.height=180;c.getContext("2d").drawImage(v,0,0,320,180);return c.toDataURL("image/jpeg",0.72)}catch(e){canSnap=false;return null}
+  }
+
+  function openComposer(){
+    v.pause();draft={t:Math.round(v.currentTime*10)/10,thumb:grab()};
+    $("cTime").textContent=fmt(draft.t);
+    var im=$("cThumb");if(draft.thumb){im.src=draft.thumb;im.hidden=false}else{im.hidden=true}
+    $("cErr").textContent="";$("composer").hidden=false;$("cText").focus();
+  }
+  $("addBtn").onclick=function(){if(!myName){wantComposer=true;v.pause();askName();return}openComposer()};
+  $("cTime").onclick=function(){if(draft)seek(draft.t)};
+  $("cancelBtn").onclick=function(){draft=null;$("composer").hidden=true;$("cText").value=""};
+  $("composer").addEventListener("submit",function(e){
+    e.preventDefault();if(!draft)return;
+    var text=$("cText").value.trim();if(!text){$("cErr").textContent="Type a comment first.";return}
+    comments.push({id:String(Date.now()),t:draft.t,slide:chapterAt(draft.t)+1,body:text,thumb:draft.thumb,at:new Date().toISOString()});
+    comments.sort(function(a,b){return a.t-b.t});save();
+    draft=null;$("composer").hidden=true;$("cText").value="";render();
+  });
+
+  function asText(){
+    var lines=["Shield Guard Sales Training: review comments from "+(myName||"a reviewer"),""];
+    comments.forEach(function(c){lines.push("["+fmt(c.t)+"] Slide "+c.slide+": "+c.body.replace(/\s*\n\s*/g," / "))});
+    return lines.join("\n");
+  }
+  $("sendBtn").onclick=function(){
+    var txt=asText();$("sendText").value=txt;$("sendbox").hidden=false;
+    $("mailBtn").href="mailto:"+TO+"?subject="+encodeURIComponent("Shield Guard video review: "+(myName||"comments"))+"&body="+encodeURIComponent(txt.length>1800?txt.slice(0,1800)+"\n\n(Paste the rest from the review page.)":txt);
+    var p=$("sendbox").querySelector("p b");
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){p.textContent="Copied."},function(){p.textContent="Select and copy the text below.";$("sendText").select()})}
+    else{p.textContent="Select and copy the text below.";$("sendText").select()}
+  };
+  $("closeSend").onclick=function(){$("sendbox").hidden=true};
+
+  function render(){
+    $("counts").textContent=comments.length?(comments.length+(comments.length===1?" comment":" comments")+" saved in this browser"):"None yet";
+    $("sendBtn").disabled=!comments.length;
+    track.querySelectorAll(".dot").forEach(function(d){d.remove()});
+    comments.forEach(function(c){
+      var d=document.createElement("button");d.type="button";d.className="dot";d.style.left=(c.t/dur()*100)+"%";
+      d.title=fmt(c.t)+" · "+c.body.slice(0,80);d.onclick=function(e){e.stopPropagation();go(c);var n=$("c-"+c.id);if(n)n.scrollIntoView({block:"nearest"})};track.appendChild(d);
+    });
+    list.querySelectorAll(".c").forEach(function(n){n.remove()});
+    empty.hidden=comments.length>0;
+    comments.forEach(function(c){list.appendChild(card(c))});
+  }
+  function card(c){
+    var el=document.createElement("div");el.className="c"+(c.id===activeId?" active":"");el.id="c-"+c.id;
+    var th;
+    if(c.thumb){th=document.createElement("img");th.className="th";th.src=c.thumb;th.alt="Frame at "+fmt(c.t)}
+    else{th=document.createElement("button");th.type="button";th.className="th none";th.textContent=fmt(c.t)}
+    th.addEventListener("click",function(){go(c)});
+    var body=document.createElement("div");body.style.minWidth="0";
+    var meta=document.createElement("div");meta.className="meta";
+    var tc=document.createElement("button");tc.type="button";tc.className="tc";tc.textContent=fmt(c.t);tc.onclick=function(){go(c)};meta.appendChild(tc);
+    var sl=document.createElement("span");sl.textContent="Slide "+c.slide;meta.appendChild(sl);
+    var txt=document.createElement("p");txt.className="txt";txt.textContent=c.body;
+    body.appendChild(meta);body.appendChild(txt);
+    var ops=document.createElement("div");ops.className="ops";
+    if(pendingDelete===c.id){
+      var q=document.createElement("span");q.textContent="Delete this comment?";ops.appendChild(q);
+      var yes=document.createElement("button");yes.type="button";yes.textContent="Delete";yes.style.color="var(--warn)";
+      yes.onclick=function(){pendingDelete=null;comments=comments.filter(function(x){return x.id!==c.id});save();render()};
+      var no=document.createElement("button");no.type="button";no.textContent="Keep";no.onclick=function(){pendingDelete=null;render()};
+      ops.appendChild(yes);ops.appendChild(no);
+    } else {var del=document.createElement("button");del.type="button";del.textContent="Delete";del.onclick=function(){pendingDelete=c.id;render()};ops.appendChild(del)}
+    body.appendChild(ops);el.appendChild(th);el.appendChild(body);return el;
+  }
+  function go(c){activeId=c.id;seek(c.t);document.querySelectorAll(".c").forEach(function(n){n.classList.toggle("active",n.id==="c-"+c.id)})}
+  render();
+})();
+</script>
+</body>
+</html>
